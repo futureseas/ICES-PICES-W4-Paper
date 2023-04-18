@@ -108,14 +108,17 @@
 # Once the DBdata.RData file is in the working directory, simply run the following command to
 # load up the database data into matrix/dataframe files for the model fits included version of the database.
 
-
-load("G:\\My Drive\\ICES PICES W4 Paper\\R Data\\DBdata[asmt][v4.495].RData")
+gc()
+gg <- load("G:\\My Drive\\ICES PICES W4 Paper\\R Data\\DBdata[asmt][v4.495].RData")
+rm(list = setdiff(ls(), c("taxonomy", 'metadata', 'tl.data', 'tc.data')))
 
 library(data.table)
 library(tidyverse)
 taxonomy <- taxonomy %>% dplyr::filter(FisheryType == "Forage Fish")
 metadata <- setDT(metadata)[scientificname %chin% taxonomy$scientificname] 
 tl.data.year <- tibble::rownames_to_column(tl.data, var = "year") %>% filter(year >= 2000)
+tc.data.year <- tibble::rownames_to_column(tc.data, var = "year") %>% filter(year >= 2000)
+
 tl.data.T <- t(tl.data.year) 
 colnames(tl.data.T) <- tl.data.T[1,]
 tl.data.T <- tl.data.T[-1,]
