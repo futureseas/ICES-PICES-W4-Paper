@@ -69,7 +69,7 @@ forage.data.mean <- forage.data.mean %>% drop_na()
 # forage.data.mean.expand <- forage.data.mean %>% expand(region, commonname)
 # forage.data.mean <- forage.data.mean %>% dplyr::right_join(forage.data.mean.expand)
 
-forage.data.mean [is.na(forage.data.mean)] <- 0
+forage.data.mean[is.na(forage.data.mean)] <- 0
 
 # forage.data.mean <- forage.data.mean[order(-forage.data.mean$mean),] #forage.data.mean$region, 
 # forage.data.mean.highest <- forage.data.mean %>% 
@@ -116,13 +116,12 @@ forage.data.mean.wide <- forage.data.mean.wide %>%
   mutate(lat  = ifelse(region == "US Southeast and Gulf", 30, lat)) %>%
   mutate(long = ifelse(region == "Southern Africa", 24, long)) %>%
   mutate(lat  = ifelse(region == "Southern Africa", -26, lat)) %>%
-  mutate(long = ifelse(region == "European Union", long-10, long)) %>%
-  mutate(lat  = ifelse(region == "European Union", lat, lat)) %>%
+  mutate(long = ifelse(region == "European Union", long-15, long)) %>%
+  mutate(lat  = ifelse(region == "European Union", lat+5, lat)) %>%
   drop_na()
   
 world_map_data <- ne_countries(scale = "medium", returnclass = "sf")
 land_color <- c('antiquewhite1')
-# dev.off()
 
 
 mytheme <- theme(panel.grid.major = element_line(color = '#cccccc' 
@@ -137,49 +136,47 @@ mytheme <- theme(panel.grid.major = element_line(color = '#cccccc'
 )
 
 
-# #----------------------------------------------
-# # CREATE X AND Y 'NUDGE' OFFSETS FOR PORT NAMES
-# #----------------------------------------------
-# port_data %>% 
-#   mutate(x_nudge = case_when( location == 'Port Brownsville, Texas' ~ 1.3
-#                               ,location == 'Port Isabel, Texas' ~ 1.3
-#                               ,location == 'Port Mansfield, Texas' ~ 1.5
-#                               ,location == 'Port Corpus Christi, Texas' ~ 1.5
-#                               ,location == 'Port Lavaca, Texas' ~ -1
-#                               ,location == 'Port Freeport, Texas' ~ 1
-#                               #,location == 'Port of Texas City, Texas' ~ 0
-#                               ,location == 'Texas City, Texas' ~ -1
-#                               ,location == 'Port Galveston, Texas' ~ 1
-#                               ,location == 'Port Houston, Texas' ~ -1.5
-#                               ,location == 'Port Sabine Pass, Texas' ~ .5
-#                               ,location == 'Port Arthur, Texas' ~ 1
-#                               ,location == 'Port Beaumont, Texas' ~ -.6
-#                               ,location == 'Port of Orange, Texas' ~ 1.6
-#                               ,TRUE ~ 0)
-#          ,y_nudge = case_when( location == 'Port Brownsville, Texas' ~ -1
-#                                ,location == 'Port Isabel, Texas' ~ 0
-#                                ,location == 'Port Mansfield, Texas' ~ .2
-#                                ,location == 'Port Corpus Christi, Texas' ~ 0
-#                                ,location == 'Port Lavaca, Texas' ~ .5
-#                                ,location == 'Port Freeport, Texas' ~ -.5
-#                                ,location == 'Texas City, Texas' ~ 0
-#                                ,location == 'Port Galveston, Texas' ~ -.5
-#                                ,location == 'Port Houston, Texas' ~ .8
-#                                ,location == 'Port Sabine Pass, Texas' ~ -.5
-#                                ,location == 'Port Arthur, Texas' ~ .1
-#                                ,location == 'Port Beaumont, Texas' ~ .6
-#                                ,location == 'Port of Orange, Texas' ~ .5
-#                                ,TRUE ~ 0)
-#   ) ->
-#   port_data
 
 
 
-##
-# Create Plot!
+###################
+ ## Create Map! ##
+###################
 
 library(scatterpie)
 max_obs = ncol(forage.data.mean.wide) - 3
+
+# CREATE X AND Y 'NUDGE' 
+forage.data.mean.wide <- forage.data.mean.wide %>% 
+  mutate(x_nudge = case_when(region == "Australia" ~ 2,
+                             region == "Canada East Coast" ~ 20,
+                             region == "Canada West Coast" ~ 0, 
+                             region == "Europe non EU" ~ 0,
+                             region == "European Union" ~ 10,
+                             region == "Japan" ~ 0, 
+                             region == "Mediterranean-Black Sea" ~ 0,
+                             region == "South America" ~ 0,
+                             region == "Southern Africa" ~ 0,
+                             region == "US East Coast" ~ 25,
+                             region == "US Southeast and Gulf" ~ 30,
+                             region == "US West Coast" ~ -1,
+                             region == "West Africa" ~ 0,
+                             TRUE ~ 0),
+         y_nudge = case_when(region == "Australia" ~ 0,
+                             region == "Canada East Coast" ~ 8,
+                             region == "Canada West Coast" ~ 1, 
+                             region == "Europe non EU" ~ 15,
+                             region == "European Union" ~ 0,
+                             region == "Japan" ~ 0, 
+                             region == "Mediterranean-Black Sea" ~ -10,
+                             region == "South America" ~ 0,
+                             region == "Southern Africa" ~ 0,
+                             region == "US East Coast" ~ 0,
+                             region == "US Southeast and Gulf" ~ -5,
+                             region == "US West Coast" ~ 0,
+                             region == "West Africa" ~ 0,
+                             TRUE ~ 0))
+
 ggplot() +
   geom_sf(data = world_map_data, fill = land_color, size = .4) +
   geom_scatterpie(aes(x=long, y=lat, group = region, r = sqrt(total_catch/10000)), 
@@ -190,5 +187,7 @@ ggplot() +
   theme(legend.position = "bottom") + 
   geom_scatterpie_legend(sqrt(forage.data.mean.wide$total_catch/10000), x=-160, y=-40, labeller=function(x) (x/10)^2) +
   geom_text_repel(aes(x=long, y=lat, group = region, label = region), 
-            data = forage.data.mean.wide, segment.color = "#333333")
+            data = forage.data.mean.wide, segment.color = "#333333",
+            nudge_x = forage.data.mean.wide$x_nudge, 
+            nudge_y = forage.data.mean.wide$y_nudge)
 
