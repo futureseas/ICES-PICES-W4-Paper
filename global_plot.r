@@ -180,10 +180,9 @@ forage.data.mean.wide <- forage.data.mean.wide %>%
 ggplot() +
   geom_sf(data = world_map_data, fill = land_color, size = .4) +
   geom_scatterpie(aes(x=long, y=lat, group = region, r = sqrt(total_catch/10000)), 
-                data = forage.data.mean.wide, 
+                data = forage.data.mean.wide, legend_name = "Species",
                 cols = colnames(forage.data.mean.wide[,c(2:max_obs)])) +
   mytheme +
-  labs(title = "Average annual catches (2000-2020) of forage fish by region and species (Million tons?)") +
   theme(legend.position = "bottom") + 
   geom_scatterpie_legend(sqrt(forage.data.mean.wide$total_catch/10000), x=-160, y=-40, labeller=function(x) (x/10)^2) +
   geom_text_repel(aes(x=long, y=lat, group = region, label = region), 
