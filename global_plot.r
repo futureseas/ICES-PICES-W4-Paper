@@ -137,8 +137,6 @@ mytheme <- theme(panel.grid.major = element_line(color = '#cccccc'
 
 
 
-
-
 ###################
  ## Create Map! ##
 ###################
