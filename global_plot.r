@@ -32,6 +32,8 @@ tl.data <- merge(tl.data, metadata, by=(c('stockid')), all.x = TRUE, all.y = FAL
 tc.data <- merge(tc.data, metadata, by=(c('stockid')), all.x = TRUE, all.y = FALSE) %>% mutate(type_data = "tc")
 
 forage.data <- rbind(tl.data, tc.data)
+xx <- forage.data %>% ungroup() %>% dplyr::select(c("commonname", "scientificname")) %>% unique()
+
 forage.data <- forage.data %>% group_by(stockid, region, commonname) %>% 
   summarize(X2000 = max(as.numeric(X2010)), X2001 = max(as.numeric(X2011)),
             X2002 = max(as.numeric(X2012)), X2003 = max(as.numeric(X2013)),
@@ -44,6 +46,102 @@ forage.data <- forage.data %>% group_by(stockid, region, commonname) %>%
             X2016 = max(as.numeric(X2016)), X2017 = max(as.numeric(X2017)),
             X2018 = max(as.numeric(X2018)), X2019 = max(as.numeric(X2019)), 
             X2020 = max(as.numeric(X2020))) 
+
+
+
+## Grouping species in smaller categories
+
+# print(forage.data %>% ungroup() %>% dplyr::select(c("scientificname")) %>% unique(), n=45)
+# 
+# forage.data <- within(forage.data, scientificname[scientificname == "Scomber colias"] <- "Scomber")           
+# forage.data <- within(forage.data, scientificname[scientificname == "Engraulis encrasicolus"] <- "Engraulis")    
+# forage.data <- within(forage.data, scientificname[scientificname == "Clupeonella engrauliformis"] <- "Clupeonella")
+# forage.data <- within(forage.data, scientificname[scientificname == "Engraulis anchoita"] <- "Engraulis")         
+# forage.data <- within(forage.data, scientificname[scientificname == "Decapterus muroadsi"] <- "Decapterus")        
+# forage.data <- within(forage.data, scientificname[scientificname == "Trachurus picturatus"] <- "Trachurus")       
+# forage.data <- within(forage.data, scientificname[scientificname == "Scomber australasicus"] <- "Scomber")    
+# forage.data <- within(forage.data, scientificname[scientificname == "Ethmalosa fimbriata"] <- "Ethmalosa")         
+# forage.data <- within(forage.data, scientificname[scientificname == "Mallotus villosus"] <- "Mallotus")          
+# forage.data <- within(forage.data, scientificname[scientificname == "Clupea bentincki"] <- "Clupea")           
+# forage.data <- within(forage.data, scientificname[scientificname == "Trachurus trecae"] <- "Trachurus")           
+# forage.data <- within(forage.data, scientificname[scientificname == "Trachurus murphyi"] <- "Trachurus")          
+# forage.data <- within(forage.data, scientificname[scientificname == "Scomber japonicus"] <- "Scomber")         
+# forage.data <- within(forage.data, scientificname[scientificname == "Strangomera bentincki"] <- "Strangomera")   
+# forage.data <- within(forage.data, scientificname[scientificname == "Trachurus capensis"] <- "Trachurus")         
+# forage.data <- within(forage.data, scientificname[scientificname == "Glossanodon semifasciatus"] <- "Glossanodon") 
+# forage.data <- within(forage.data, scientificname[scientificname == "Thaleichthys pacificus"] <- "Thaleichthys")    
+# forage.data <- within(forage.data, scientificname[scientificname == "Argentina silus"] <- "Argentina")           
+# forage.data <- within(forage.data, scientificname[scientificname == "Clupea harengus"] <- "Clupea")           
+# forage.data <- within(forage.data, scientificname[scientificname == "Clupea pallasii"] <- "Clupea")           
+# forage.data <- within(forage.data, scientificname[scientificname == "Trachurus trachurus"] <- "Trachurus")        
+# forage.data <- within(forage.data, scientificname[scientificname == "Engraulis japonicus"] <- "Engraulis")        
+# forage.data <- within(forage.data, scientificname[scientificname == "Trachurus japonicus"] <- "Trachurus")        
+# forage.data <- within(forage.data, scientificname[scientificname == "Scomber scombrus"] <- "Scomber")          
+# forage.data <- within(forage.data, scientificname[scientificname == "Brevoortia patronus"] <- "Brevoortia")       
+# forage.data <- within(forage.data, scientificname[scientificname == "Brevoortia tyrannus"] <- "Brevoortia")       
+# forage.data <- within(forage.data, scientificname[scientificname == "Trachurus mediterraneus"] <- "Trachurus")    
+# forage.data <- within(forage.data, scientificname[scientificname == "Sardinella maderensis"] <- "Sardinella")     
+# forage.data <- within(forage.data, scientificname[scientificname == "Engraulis ringens"] <- "Engraulis")          
+# forage.data <- within(forage.data, scientificname[scientificname == "Sardinops melanostictus"] <- "Sardinops")   
+# forage.data <- within(forage.data, scientificname[scientificname == "Ammodytes personatus"] <- "Ammodytes")      
+# forage.data <- within(forage.data, scientificname[scientificname == "Ammodytes hexapterus"] <- "Ammodytes")      
+# forage.data <- within(forage.data, scientificname[scientificname == "Etrumeus teres"] <- "Etrumeus")            
+# forage.data <- within(forage.data, scientificname[scientificname == "Sardinella aurita"] <- "Sardinella")          
+# forage.data <- within(forage.data, scientificname[scientificname == "Sardinops sagax"] <- "Sardinops")           
+# forage.data <- within(forage.data, scientificname[scientificname == "Sardinella spp"] <- "Sardinops")             
+# forage.data <- within(forage.data, scientificname[scientificname == "Sardina pilchardus"] <- "Sardina")        
+# forage.data <- within(forage.data, scientificname[scientificname == "Cololabis saira"] <- "Cololabis")           
+# forage.data <- within(forage.data, scientificname[scientificname == "Decapterus spp"] <- "Decapterus")            
+# forage.data <- within(forage.data, scientificname[scientificname == "Ammodytes spp"] <- "Ammodytes")             
+# forage.data <- within(forage.data, scientificname[scientificname == "Sprattus sprattus"] <- "Sprattus")         
+# forage.data <- within(forage.data, scientificname[scientificname == "Sprattus fuegensis"] <- "Sprattus")  
+
+forage.data <- within(forage.data, commonname[commonname == "Argentine chub mackerel"] <- "Mackerel")
+forage.data <- within(forage.data, commonname[commonname == "Anchovy"] <- "Anchovy")
+forage.data <- within(forage.data, commonname[commonname == "Anchovy kilka"] <- "Anchovy")
+forage.data <- within(forage.data, commonname[commonname == "Argentine anchoita"] <- "Anchovy")
+forage.data <- within(forage.data, commonname[commonname == "Amberstripe scad"] <- "Scad")
+forage.data <- within(forage.data, commonname[commonname == "Blue jack mackerel"] <- "Mackerel")
+forage.data <- within(forage.data, commonname[commonname == "Spotted mackerel"] <- "Mackerel")
+# forage.data <- within(forage.data, commonname[commonname == "Bonga"] <- "Bonga")
+# forage.data <- within(forage.data, commonname[commonname == "Capelin"] <- "Capelin")
+forage.data <- within(forage.data, commonname[commonname == "Chilean herring"] <- "Herring")
+forage.data <- within(forage.data, commonname[commonname == "Cunene horse mackerel"] <- "Mackerel")
+forage.data <- within(forage.data, commonname[commonname == "Chilean jack mackerel"] <- "Mackerel")
+forage.data <- within(forage.data, commonname[commonname == "Chub mackerel"] <- "Mackerel")
+forage.data <- within(forage.data, commonname[commonname == "Pacific chub mackerel"] <- "Mackerel")
+forage.data <- within(forage.data, commonname[commonname == "Chilean sardine"] <- "Sardine")
+forage.data <- within(forage.data, commonname[commonname == "Cape horse mackerel"] <- "Mackerel")
+forage.data <- within(forage.data, commonname[commonname == "Deep sea smelt"] <- "Smelt")
+# forage.data <- within(forage.data, commonname[commonname == "Eulachon"] <- "Eulachon")
+forage.data <- within(forage.data, commonname[commonname == "Greater silver smelt"] <- "Smelt")
+forage.data <- within(forage.data, commonname[commonname == "Herring"] <- "Herring")
+forage.data <- within(forage.data, commonname[commonname == "Pacific herring"] <- "Herring")
+forage.data <- within(forage.data, commonname[commonname == "Horse mackerel"] <- "Mackerel")
+forage.data <- within(forage.data, commonname[commonname == "Japanese anchovy"] <- "Anchovy")
+forage.data <- within(forage.data, commonname[commonname == "Japanese jack mackerel"] <- "Mackerel")
+forage.data <- within(forage.data, commonname[commonname == "Atlantic mackerel"] <- "Mackerel")
+forage.data <- within(forage.data, commonname[commonname == "Mackerel"] <- "Mackerel")
+forage.data <- within(forage.data, commonname[commonname == "Gulf menhaden"] <- "Menhaden")
+forage.data <- within(forage.data, commonname[commonname == "Atlantic menhaden"] <- "Menhaden")
+forage.data <- within(forage.data, commonname[commonname == "Mediterranean horse mackerel"] <- "Mackerel")
+forage.data <- within(forage.data, commonname[commonname == "Madeiran sardinella"] <- "Sardine")
+forage.data <- within(forage.data, commonname[commonname == "Peruvian anchoveta"] <- "Anchovy")
+forage.data <- within(forage.data, commonname[commonname == "Japanese sardine"] <- "Sardine")
+forage.data <- within(forage.data, commonname[commonname == "Pacific sandlance"] <- "Sandlance")
+forage.data <- within(forage.data, commonname[commonname == "Pacific sand lance"] <- "Sandlance")
+forage.data <- within(forage.data, commonname[commonname == "Round herring"] <- "Herring")
+forage.data <- within(forage.data, commonname[commonname == "Round sardinella"] <- "Sardinella")
+forage.data <- within(forage.data, commonname[commonname == "Pacific sardine"] <- "Sardine")
+forage.data <- within(forage.data, commonname[commonname == "Sardinella"] <- "Sardinella")
+forage.data <- within(forage.data, commonname[commonname == "European pilchard"] <- "Pilchard")
+forage.data <- within(forage.data, commonname[commonname == "Sardine"] <- "Sardine")
+forage.data <- within(forage.data, commonname[commonname == "Pacific saury"] <- "Saury")
+forage.data <- within(forage.data, commonname[commonname == "Scad spp"] <- "Scad")
+# forage.data <- within(forage.data, commonname[commonname == "Sand eel
+# forage.data <- within(forage.data, commonname[commonname == "Sprat
+forage.data <- within(forage.data, commonname[commonname == "Southern sardine"] <- "Sardine")
+
 
 
 ## Aggregate data by country
