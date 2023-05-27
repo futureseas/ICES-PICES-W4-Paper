@@ -5,7 +5,7 @@
 # This will load database data from the file DBdata.RData.
 
 gc()
-gg <- read.csv("G:\\My Drive\\ICES PICES W4 Paper\\FAO_DATA\\FAO_fish_stat.csv")
+gg <- read.csv("G:\\My Drive\\ICES PICES W4 Paper\\FAO_DATA\\FAO_fish_stat_cont.csv")
 
 library(data.table)
 library(tidyverse)
@@ -16,17 +16,17 @@ forage.data <- gg %>%
   select(-c('S', 'S.1', 'S.2', 'S.3', 'S.4', 'S.5', 
             'S.6', 'S.7', 'S.8', 'S.9', 'S.10')) %>% 
   group_by(Country..Name., ASFIS.species..Name.) %>% 
-  summarize(X2010 = max(as.numeric(X.2010.)), 
-            X2011 = max(as.numeric(X.2011.)),
-            X2012 = max(as.numeric(X.2012.)), 
-            X2013 = max(as.numeric(X.2013.)),
-            X2014 = max(as.numeric(X.2014.)), 
-            X2015 = max(as.numeric(X.2015.)),
-            X2016 = max(as.numeric(X.2016.)), 
-            X2017 = max(as.numeric(X.2017.)),
-            X2018 = max(as.numeric(X.2018.)), 
-            X2019 = max(as.numeric(X.2019.)), 
-            X2020 = max(as.numeric(X.2020.))) %>%
+  summarize(X2010 = sum(as.numeric(X.2010.)), 
+            X2011 = sum(as.numeric(X.2011.)),
+            X2012 = sum(as.numeric(X.2012.)), 
+            X2013 = sum(as.numeric(X.2013.)),
+            X2014 = sum(as.numeric(X.2014.)), 
+            X2015 = sum(as.numeric(X.2015.)),
+            X2016 = sum(as.numeric(X.2016.)), 
+            X2017 = sum(as.numeric(X.2017.)),
+            X2018 = sum(as.numeric(X.2018.)), 
+            X2019 = sum(as.numeric(X.2019.)), 
+            X2020 = sum(as.numeric(X.2020.))) %>%
   rename(Area.Name = Country..Name.) %>%
   rename(Species = ASFIS.species..Name.) %>% ungroup()
 
@@ -122,16 +122,6 @@ for(i in 1:nrow(forage.data.mean.wide)){
   forage.data.mean.wide$lat[i] = coordinates$lat
 }  
 
-# forage.data.mean.wide <- forage.data.mean.wide %>%
-#   mutate(long = ifelse(region == "Europe non EU", 22, long)) %>%
-#   mutate(lat  = ifelse(region == "Europe non EU", 63, lat)) %>%
-#   mutate(long = ifelse(region == "US Southeast and Gulf", -88, long)) %>%
-#   mutate(lat  = ifelse(region == "US Southeast and Gulf", 30, lat)) %>%
-#   mutate(long = ifelse(region == "Southern Africa", 24, long)) %>%
-#   mutate(lat  = ifelse(region == "Southern Africa", -26, lat)) %>%
-#   mutate(long = ifelse(region == "European Union", long-15, long)) %>%
-#   mutate(lat  = ifelse(region == "European Union", lat+5, lat)) %>%
-#   drop_na()
 
 world_map_data <- ne_countries(scale = "medium", returnclass = "sf")
 land_color <- c('antiquewhite1')
@@ -157,7 +147,7 @@ library(scatterpie)
 max_obs = ncol(forage.data.mean.wide) - 3
 
 # CREATE X AND Y 'NUDGE' 
-forage.data.mean.wide <- forage.data.mean.wide %>% 
+forage.data.mean.wide2 <- forage.data.mean.wide %>% 
   mutate(x_nudge = case_when(Area.Name == "Australia and New Zealand" ~ 0,
                              Area.Name == "Caribbean" ~ 0,
                              Area.Name == "Central America" ~ 0,
@@ -205,16 +195,55 @@ forage.data.mean.wide <- forage.data.mean.wide %>%
                              Area.Name == "Western Europe" ~ 0,
                                TRUE ~ 0))
 
+forage.data.mean.wide3 <- forage.data.mean.wide2 %>%
+  mutate(long = ifelse(Area.Name == "Southern Africa", long+145, long)) %>%
+  mutate(lat  = ifelse(Area.Name == "Southern Africa", lat-75, lat)) %>%
+  mutate(long = ifelse(Area.Name == "Northern Africa", long, long)) %>%
+  mutate(lat  = ifelse(Area.Name == "Northern Africa", lat+20, lat)) %>%
+  mutate(long = ifelse(Area.Name == "Eastern Africa", long+10, long)) %>%
+  mutate(lat  = ifelse(Area.Name == "Eastern Africa", lat, lat)) %>%
+  mutate(long = ifelse(Area.Name == "Northern America", long-15, long)) %>%
+  mutate(lat  = ifelse(Area.Name == "Northern America", lat+5, lat)) %>%
+  mutate(long = ifelse(Area.Name == "Western Africa", long-30, long)) %>%
+  mutate(lat  = ifelse(Area.Name == "Western Africa", lat+50, lat)) %>%
+  mutate(long = ifelse(Area.Name == "Central America", long-250, long)) %>%
+  mutate(lat  = ifelse(Area.Name == "Central America", lat+45, lat)) %>%
+  mutate(long = ifelse(Area.Name == "Australia and New Zealand", long-20, long)) %>%
+  mutate(lat  = ifelse(Area.Name == "Australia and New Zealand", lat+10, lat)) %>%
+  mutate(long = ifelse(Area.Name == "Middle Africa", 7, long)) %>%
+  mutate(lat  = ifelse(Area.Name == "Middle Africa", 1, lat)) %>%
+  mutate(long = ifelse(Area.Name == "Western Europe", -11, long)) %>%
+  mutate(lat  = ifelse(Area.Name == "Western Europe", 45, lat)) %>%
+  mutate(long = ifelse(Area.Name == "Southern Europe", 12, long)) %>%
+  mutate(lat  = ifelse(Area.Name == "Southern Europe", 41, lat)) %>%
+  mutate(long = ifelse(Area.Name == "Northern Europe", 14, long)) %>%
+  mutate(lat  = ifelse(Area.Name == "Northern Europe", 75, lat)) %>%
+  mutate(long = ifelse(Area.Name == "Eastern Europe", 35, long)) %>%
+  mutate(lat  = ifelse(Area.Name == "Eastern Europe", 50, lat)) %>%
+  mutate(long = ifelse(Area.Name == "South-Eastern Asia", 113.33, long)) %>%
+  mutate(lat  = ifelse(Area.Name == "South-Eastern Asia", 8.59, lat)) %>%
+  mutate(long = ifelse(Area.Name == "Southern Asia", 76.78, long)) %>%
+  mutate(lat  = ifelse(Area.Name == "Southern Asia", 17.83, lat)) %>%
+  mutate(long = ifelse(Area.Name == "Western Asia", 51.11, long)) %>%
+  mutate(lat  = ifelse(Area.Name == "Western Asia", 33.11, lat)) %>%
+  mutate(long = ifelse(Area.Name == "Eastern Asia", 133, long)) %>%
+  mutate(lat  = ifelse(Area.Name == "Eastern Asia", 38, lat)) 
+
+forage.data.mean.wide3 <- forage.data.mean.wide3 %>%
+  filter(Area.Name != "Polynesia") %>%
+  filter(Area.Name != "Micronesia") %>%
+  filter(Area.Name != "Others")
+
 ggplot() +
   geom_sf(data = world_map_data, fill = land_color, size = .4) +
   geom_scatterpie(aes(x=long, y=lat, group = Area.Name, r = sqrt(total_catch/10000)), 
-                  data = forage.data.mean.wide, legend_name = "Species",
-                  cols = colnames(forage.data.mean.wide[,c(2:max_obs)])) +
+                  data = forage.data.mean.wide3, legend_name = "Species",
+                  cols = colnames(forage.data.mean.wide3[,c(2:max_obs)])) +
   mytheme +
   theme(legend.position = "bottom") + 
-  geom_scatterpie_legend(sqrt(forage.data.mean.wide$total_catch/10000), x=-160, y=-40, labeller=function(x) (x/10)^2) +
+  geom_scatterpie_legend(sqrt(forage.data.mean.wide3$total_catch/10000), x=-160, y=-40, labeller=function(x) (x/10)^2) +
   geom_text_repel(aes(x=long, y=lat, group = Area.Name, label = Area.Name), 
-                  data = forage.data.mean.wide, segment.color = "#333333",
-                  nudge_x = forage.data.mean.wide$x_nudge, 
-                  nudge_y = forage.data.mean.wide$y_nudge)
+                  data = forage.data.mean.wide3, segment.color = "#333333",
+                  nudge_x = forage.data.mean.wide3$x_nudge, 
+                  nudge_y = forage.data.mean.wide3$y_nudge)
 
