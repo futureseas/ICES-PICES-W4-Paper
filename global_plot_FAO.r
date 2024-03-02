@@ -32,22 +32,42 @@ forage.data <- gg %>%
 
 
 ## Grouping species in smaller categories
+### Horse mackerel and Jack mackerel are scad --- FIX THIS!!!!###
+
 
 print(forage.data %>% ungroup() %>% dplyr::select(c("Species")) %>% unique(), n=250) 
 forage.data.filtered <- forage.data %>%
   dplyr::mutate(Species2 = 
-    ifelse(str_detect(Species, "nchovy"), "Anchovy", 
+    ifelse(str_detect(Species, "nchov"), "Anchovy", 
     ifelse(str_detect(Species, "ardine"), "Sardines", 
-    ifelse(str_detect(Species, "ardinella"), "Sardinellas", 
     ifelse(str_detect(Species, "herring"), "Herrings", 
     ifelse(str_detect(Species, "scad"), "Scads",
-    ifelse(str_detect(Species, "ackerel"), "Mackerels",
-    ifelse(str_detect(Species, "smelt"), "Smetls",
-    ifelse(str_detect(Species, "ackerel"), "Mackerels",
+    ifelse(str_detect(Species, "horse mackerel"), "Scads",
+    ifelse(str_detect(Species, "jack"), "Scads", 
+    ifelse(str_detect(Species, "ackerel"), "Mackerels", 
+    ifelse(str_detect(Species, "smelt"), "Others",
     ifelse(str_detect(Species, "menhaden"), "Menhaden",
-    ifelse(str_detect(Species, "saury"), "Saury",
-    ifelse(str_detect(Species, "sprat"), "Sprat", NA)))))))))))) 
-                                                                                
+    ifelse(str_detect(Species, "saur"), "Saury",
+    ifelse(str_detect(Species, "sprat"), "Sprat", 
+    ifelse(str_detect(Species, "utterfish"), "Others",
+    ifelse(str_detect(Species, "apelin"), "Capelin",
+    ifelse(str_detect(Species, "lyingfis"), "Others",
+    ifelse(str_detect(Species, "shad"), "Shad", NA))))))))))))))))
+    
+
+###INCLUDE THESES!!!!!!!!!
+#flyingfish, capelin, shad, sauries, butterfishes
+
+# filt.inds <-grep("nchov|ardine|herring|scad|horse mackerel|jack|ackerel|smelt|
+#                  menhaden|aur|sprat|utterfish|apelin|lyingfis|shad", forage.data$Species)
+# temp1 <- forage.data[-filt.inds, ]   
+# head(temp1)
+# temp1 %>% distinct(Species) %>% arrange %>% as.data.frame
+
+
+
+
+
 ## Aggregate data by country
 library(tidyr)
 forage.data.Total <- forage.data.filtered%>% 
@@ -197,8 +217,8 @@ forage.data.mean.wide3 <- forage.data.mean.wide2 %>%
   mutate(lat  = ifelse(Area.Name == "Northern America", lat+5, lat)) %>%
   mutate(long = ifelse(Area.Name == "Western Africa", long-30, long)) %>%
   mutate(lat  = ifelse(Area.Name == "Western Africa", lat+50, lat)) %>%
-  mutate(long = ifelse(Area.Name == "Central America", long-250, long)) %>%
-  mutate(lat  = ifelse(Area.Name == "Central America", lat+45, lat)) %>%
+  mutate(long = ifelse(Area.Name == "Central America", long+50, long)) %>%
+  mutate(lat  = ifelse(Area.Name == "Central America", lat-50, lat)) %>%
   mutate(long = ifelse(Area.Name == "Australia and New Zealand", long-20, long)) %>%
   mutate(lat  = ifelse(Area.Name == "Australia and New Zealand", lat+10, lat)) %>%
   mutate(long = ifelse(Area.Name == "Middle Africa", 7, long)) %>%
